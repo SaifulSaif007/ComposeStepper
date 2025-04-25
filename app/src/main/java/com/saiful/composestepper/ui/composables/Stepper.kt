@@ -3,7 +3,7 @@ package com.saiful.composestepper.ui.composables
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,29 +13,21 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 
 @Composable
 fun Stepper() {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(12.dp),
     ) {
 
         Row {
-            repeat(times = 4) {
+            repeat(times = 3) {
                 StepperItem(
-                    modifier = if (it != 3) Modifier.weight(1f) else Modifier,
-                    hasNextStep = it != 3,
-                    content = {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Add",
-                            modifier = Modifier.size(24.dp),
-                            tint = Color.White // Set the color of the icon
-                        )
-
-                    }
+                    modifier = if (it != 2) Modifier.weight(1f) else Modifier,
+                    hasNextStep = it != 2
                 )
             }
         }
@@ -49,16 +41,17 @@ fun Stepper() {
 private fun StepperItem(
     modifier: Modifier,
     hasNextStep: Boolean,
-    content: @Composable () -> Unit
 ) {
-    Row(
-        modifier = modifier
-            .wrapContentWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+
+    ConstraintLayout(modifier = modifier.padding(vertical = 4.dp, horizontal = 2.dp)) {
+        val (circle, line, text) = createRefs()
+
         Box(
             modifier = Modifier
+                .constrainAs(circle) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                }
                 .wrapContentSize()
                 .drawBehind {
                     val canvasWidth = size.width
@@ -72,17 +65,46 @@ private fun StepperItem(
                 },
             contentAlignment = Alignment.Center
         ) {
-            content()
+            Icon(
+                imageVector = Icons.Filled.Done,
+                contentDescription = "Add",
+                modifier = Modifier.size(24.dp),
+                tint = Color.White // Set the color of the icon
+            )
         }
 
-        if (hasNextStep) Box(
+        Text(
+            modifier = Modifier.constrainAs(text) {
+                top.linkTo(circle.bottom, margin = 2.dp)
+                start.linkTo(circle.start)
+                bottom.linkTo(parent.bottom)
+            },
+            text = "item"
+        )
+
+        if (hasNextStep) HorizontalDivider(
             modifier = Modifier
-                .padding(4.dp)
-                .height(4.dp)
-                .weight(1f)
+                .constrainAs(line) {
+                    top.linkTo(circle.top)
+                    bottom.linkTo(circle.bottom)
+                    start.linkTo(circle.end, margin = 4.dp)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }
                 .background(Color.Blue)
         )
     }
+
+
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun StepperItemPreview() {
+    StepperItem(
+        modifier = Modifier,
+        hasNextStep = true
+    )
 }
 
 @Preview(showBackground = true)
