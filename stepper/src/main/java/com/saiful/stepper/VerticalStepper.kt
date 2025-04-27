@@ -11,14 +11,13 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 
 @Composable
-fun HorizontalStepper(
+fun VerticalStepper(
     numberOfSteps: Int,
     activeStep: Int,
     stepTitle: List<String>
@@ -28,10 +27,10 @@ fun HorizontalStepper(
             .padding(12.dp),
     ) {
 
-        Row {
+        Column {
             repeat(times = numberOfSteps) {
                 StepperItem(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier,
                     hasNextStep = it != numberOfSteps - 1,
                     hasPrevious = it != 0,
                     state = when {
@@ -47,7 +46,6 @@ fun HorizontalStepper(
         }
 
     }
-
 }
 
 
@@ -62,34 +60,14 @@ private fun StepperItem(
 ) {
 
     ConstraintLayout(modifier = modifier) {
-        val (circle, line1, line2, text) = createRefs()
+        val (circle, line2, text) = createRefs()
 
-
-        if (hasPrevious) {
-            HorizontalDivider(
-                modifier = Modifier
-                    .constrainAs(line1) {
-                        top.linkTo(circle.top)
-                        bottom.linkTo(circle.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(circle.start, margin = 4.dp)
-                        width = Dimension.fillToConstraints
-                    },
-                thickness = 4.dp,
-                color = when (state) {
-                    StepState.DONE -> Color.Blue
-                    StepState.ACTIVE -> Color.Blue
-                    StepState.UPCOMING -> Color.Gray
-                }
-            )
-        }
 
         Box(
             modifier = Modifier
                 .constrainAs(circle) {
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
-                    end.linkTo(parent.end)
                 }
                 .size(32.dp)
                 .drawBehind {
@@ -126,24 +104,24 @@ private fun StepperItem(
 
         Text(
             modifier = Modifier.constrainAs(text) {
-                top.linkTo(circle.bottom, margin = 2.dp)
-                start.linkTo(circle.start)
-                bottom.linkTo(parent.bottom)
-                end.linkTo(circle.end)
+                top.linkTo(circle.top)
+                start.linkTo(circle.end, margin = 8.dp)
+                bottom.linkTo(circle.bottom)
+                end.linkTo(parent.end)
+                width = Dimension.wrapContent
             },
             text = stepTitle,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-        )
 
-        if (hasNextStep) HorizontalDivider(
+            )
+
+        if (hasNextStep) VerticalDivider(
             modifier = Modifier
                 .constrainAs(line2) {
-                    top.linkTo(circle.top)
-                    bottom.linkTo(circle.bottom)
-                    start.linkTo(circle.end, margin = 4.dp)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
+                    top.linkTo(circle.bottom, margin = 4.dp)
+                    bottom.linkTo(parent.bottom, margin = 4.dp)
+                    start.linkTo(circle.start)
+                    end.linkTo(circle.end)
+                    height = Dimension.value(20.dp)
                 },
             thickness = 4.dp,
             color = when (state) {
@@ -156,6 +134,7 @@ private fun StepperItem(
 
 
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -173,9 +152,9 @@ private fun StepperItemPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun StepperPreview() {
-    HorizontalStepper(
+    VerticalStepper(
         numberOfSteps = 4,
-        activeStep = 2,
+        activeStep = 4,
         stepTitle = listOf(
             "step 1",
             "step 2",
@@ -183,10 +162,4 @@ private fun StepperPreview() {
             "step 4"
         )
     )
-}
-
-enum class StepState {
-    ACTIVE,
-    DONE,
-    UPCOMING
 }
