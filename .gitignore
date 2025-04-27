@@ -13,3 +13,11 @@
 .externalNativeBuild
 .cxx
 local.properties
+.idea
+
+# Gradle files
+.gradle/
+build/
+gradle.properties
+
+/app/release/output-metadata.json
