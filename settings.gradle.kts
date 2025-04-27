@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Compose Stepper"
 include(":app")
+include(":stepper")

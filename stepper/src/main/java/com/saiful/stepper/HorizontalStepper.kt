@@ -1,4 +1,4 @@
-package com.saiful.composestepper.ui.composables
+package com.saiful.stepper
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -18,7 +18,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 
 @Composable
-fun Stepper(
+fun HorizontalStepper(
     numberOfSteps: Int,
     activeStep: Int,
     stepTitle: List<String>
@@ -173,7 +173,7 @@ private fun StepperItemPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun StepperPreview() {
-    Stepper(
+    HorizontalStepper(
         numberOfSteps = 4,
         activeStep = 2,
         stepTitle = listOf(
