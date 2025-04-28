@@ -1,6 +1,8 @@
 package com.saiful.stepper
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
@@ -20,31 +22,27 @@ import androidx.constraintlayout.compose.Dimension
 fun VerticalStepper(
     numberOfSteps: Int,
     activeStep: Int,
-    stepTitle: List<String>
+    stepItems: List<StepItem>
 ) {
-    Row(
-        modifier = Modifier
-            .padding(12.dp),
-    ) {
-
-        Column {
-            repeat(times = numberOfSteps) {
+    Row {
+        LazyColumn {
+            itemsIndexed(stepItems) { index, item ->
                 StepperItem(
                     modifier = Modifier,
-                    hasNextStep = it != numberOfSteps - 1,
-                    hasPrevious = it != 0,
+                    hasNextStep = index != numberOfSteps - 1,
                     state = when {
-                        it == activeStep - 1 -> StepState.ACTIVE
-                        it > activeStep - 1 -> StepState.UPCOMING
-                        it < activeStep - 1 -> StepState.DONE
+                        index == activeStep - 1 -> StepState.ACTIVE
+                        index > activeStep - 1 -> StepState.UPCOMING
+                        index < activeStep - 1 -> StepState.DONE
                         else -> StepState.ACTIVE
                     },
-                    stepTitle = stepTitle[it],
-                    stepValue = it + 1
+                    stepValue = index + 1,
+                    stepTitle = item.stepTitle,
+                    stepContent = item.stepContent,
                 )
             }
-        }
 
+        }
     }
 }
 
@@ -53,15 +51,18 @@ fun VerticalStepper(
 private fun StepperItem(
     modifier: Modifier,
     hasNextStep: Boolean,
-    hasPrevious: Boolean,
     state: StepState,
+    stepValue: Int,
     stepTitle: String,
-    stepValue: Int
+    stepContent: @Composable () -> Unit
 ) {
 
-    ConstraintLayout(modifier = modifier) {
-        val (circle, line2, text) = createRefs()
-
+    ConstraintLayout(
+        modifier = modifier
+            .padding(4.dp)
+            .fillMaxWidth()
+    ) {
+        val (circle, title, content, line) = createRefs()
 
         Box(
             modifier = Modifier
@@ -69,7 +70,7 @@ private fun StepperItem(
                     top.linkTo(parent.top)
                     start.linkTo(parent.start)
                 }
-                .size(32.dp)
+                .size(28.dp)
                 .drawBehind {
                     val canvasWidth = size.width
                     val canvasHeight = size.height
@@ -103,25 +104,39 @@ private fun StepperItem(
         }
 
         Text(
-            modifier = Modifier.constrainAs(text) {
+            modifier = Modifier.constrainAs(title) {
                 top.linkTo(circle.top)
                 start.linkTo(circle.end, margin = 8.dp)
                 bottom.linkTo(circle.bottom)
                 end.linkTo(parent.end)
-                width = Dimension.wrapContent
+                width = Dimension.fillToConstraints
             },
             text = stepTitle,
+        )
 
-            )
+        Column(
+            modifier = Modifier
+                .constrainAs(content) {
+                    top.linkTo(circle.bottom)
+                    start.linkTo(title.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }
+                .padding(bottom = 8.dp),
+        ) {
+            stepContent()
+            Spacer(modifier = Modifier.padding(bottom = 4.dp))
+        }
+
 
         if (hasNextStep) VerticalDivider(
             modifier = Modifier
-                .constrainAs(line2) {
-                    top.linkTo(circle.bottom, margin = 4.dp)
-                    bottom.linkTo(parent.bottom, margin = 4.dp)
+                .constrainAs(line) {
+                    top.linkTo(content.top, margin = 4.dp)
+                    bottom.linkTo(content.bottom)
                     start.linkTo(circle.start)
                     end.linkTo(circle.end)
-                    height = Dimension.value(20.dp)
+                    height = Dimension.fillToConstraints
                 },
             thickness = 4.dp,
             color = when (state) {
@@ -142,10 +157,12 @@ private fun StepperItemPreview() {
     StepperItem(
         modifier = Modifier,
         hasNextStep = true,
-        hasPrevious = false,
         state = StepState.ACTIVE,
         stepTitle = "step 1",
-        stepValue = 1
+        stepValue = 1,
+        stepContent = {
+            Text("Watch me here")
+        }
     )
 }
 
@@ -154,12 +171,21 @@ private fun StepperItemPreview() {
 private fun StepperPreview() {
     VerticalStepper(
         numberOfSteps = 4,
-        activeStep = 4,
-        stepTitle = listOf(
-            "step 1",
-            "step 2",
-            "step 3",
-            "step 4"
+        activeStep = 2,
+        stepItems = listOf(
+            StepItem("Step 1") {
+                Text("Watch me here")
+            },
+            StepItem("Step 2") {
+                Text("Watch me here")
+            },
+            StepItem("Step 3") {},
+            StepItem("Step 4") {}
         )
     )
 }
+
+data class StepItem(
+    val stepTitle: String,
+    val stepContent: @Composable () -> Unit
+)
