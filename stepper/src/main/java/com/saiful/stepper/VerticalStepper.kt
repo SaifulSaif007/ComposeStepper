@@ -62,13 +62,22 @@ private fun StepperItem(
             .padding(4.dp)
             .fillMaxWidth()
     ) {
-        val (circle, title, content, line) = createRefs()
+        val (prefixItem, circle, title, content, line) = createRefs()
+
+        Text(
+            modifier = Modifier.constrainAs(prefixItem) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                bottom.linkTo(parent.bottom)
+            },
+            text = "Prefix"
+        )
 
         Box(
             modifier = Modifier
                 .constrainAs(circle) {
                     top.linkTo(parent.top)
-                    start.linkTo(parent.start)
+                    start.linkTo(prefixItem.end, margin = 4.dp)
                 }
                 .size(28.dp)
                 .drawBehind {
@@ -171,7 +180,7 @@ private fun StepperItemPreview() {
 private fun StepperPreview() {
     VerticalStepper(
         numberOfSteps = 4,
-        activeStep = 2,
+        activeStep = 1,
         stepItems = listOf(
             StepItem("Step 1") {
                 Text("Watch me here")
@@ -179,8 +188,12 @@ private fun StepperPreview() {
             StepItem("Step 2") {
                 Text("Watch me here")
             },
-            StepItem("Step 3") {},
-            StepItem("Step 4") {}
+            StepItem("Step 3") {
+                Text("Watch me here")
+            },
+            StepItem("Step 4") {
+                Text("Watch me here")
+            }
         )
     )
 }
