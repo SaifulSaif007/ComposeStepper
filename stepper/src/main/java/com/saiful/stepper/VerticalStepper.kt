@@ -30,6 +30,7 @@ fun VerticalStepper(
                 StepperItem(
                     modifier = Modifier,
                     hasNextStep = index != numberOfSteps - 1,
+                    hasPreviousStep = index > 0,
                     state = when {
                         index == activeStep - 1 -> StepState.ACTIVE
                         index > activeStep - 1 -> StepState.UPCOMING
@@ -51,6 +52,7 @@ fun VerticalStepper(
 private fun StepperItem(
     modifier: Modifier,
     hasNextStep: Boolean,
+    hasPreviousStep: Boolean,
     state: StepState,
     stepValue: Int,
     stepTitle: String,
@@ -59,10 +61,9 @@ private fun StepperItem(
 
     ConstraintLayout(
         modifier = modifier
-            .padding(4.dp)
             .fillMaxWidth()
     ) {
-        val (prefixItem, circle, title, content, line) = createRefs()
+        val (prefixItem, circle, title, content, downLine, upLine) = createRefs()
 
         Text(
             modifier = Modifier.constrainAs(prefixItem) {
@@ -73,10 +74,28 @@ private fun StepperItem(
             text = "Prefix"
         )
 
+        if (hasPreviousStep) VerticalDivider(
+            modifier = Modifier
+                .constrainAs(upLine) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(circle.top, margin = 4.dp)
+                    start.linkTo(circle.start)
+                    end.linkTo(circle.end)
+                    height = Dimension.fillToConstraints
+                },
+            thickness = 4.dp,
+            color = when (state) {
+                StepState.ACTIVE -> Color.Blue
+                StepState.DONE -> Color.Blue
+                StepState.UPCOMING -> Color.Gray
+            }
+        )
+
         Box(
             modifier = Modifier
                 .constrainAs(circle) {
                     top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
                     start.linkTo(prefixItem.end, margin = 4.dp)
                 }
                 .size(28.dp)
@@ -114,10 +133,9 @@ private fun StepperItem(
 
         Text(
             modifier = Modifier.constrainAs(title) {
-                top.linkTo(circle.top)
+                top.linkTo(parent.top)
                 start.linkTo(circle.end, margin = 8.dp)
                 bottom.linkTo(circle.bottom)
-                end.linkTo(parent.end)
                 width = Dimension.fillToConstraints
             },
             text = stepTitle,
@@ -126,13 +144,14 @@ private fun StepperItem(
         Column(
             modifier = Modifier
                 .constrainAs(content) {
-                    top.linkTo(circle.bottom)
+                    top.linkTo(title.bottom)
                     start.linkTo(title.start)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
                 }
                 .padding(bottom = 8.dp),
         ) {
+            Spacer(modifier = Modifier.padding(bottom = 4.dp))
             stepContent()
             Spacer(modifier = Modifier.padding(bottom = 4.dp))
         }
@@ -140,9 +159,9 @@ private fun StepperItem(
 
         if (hasNextStep) VerticalDivider(
             modifier = Modifier
-                .constrainAs(line) {
-                    top.linkTo(content.top, margin = 4.dp)
-                    bottom.linkTo(content.bottom)
+                .constrainAs(downLine) {
+                    top.linkTo(circle.bottom, margin = 4.dp)
+                    bottom.linkTo(parent.bottom)
                     start.linkTo(circle.start)
                     end.linkTo(circle.end)
                     height = Dimension.fillToConstraints
@@ -166,6 +185,7 @@ private fun StepperItemPreview() {
     StepperItem(
         modifier = Modifier,
         hasNextStep = true,
+        hasPreviousStep = true,
         state = StepState.ACTIVE,
         stepTitle = "step 1",
         stepValue = 1,
@@ -180,7 +200,7 @@ private fun StepperItemPreview() {
 private fun StepperPreview() {
     VerticalStepper(
         numberOfSteps = 4,
-        activeStep = 1,
+        activeStep = 3,
         stepItems = listOf(
             StepItem("Step 1") {
                 Text("Watch me here")
