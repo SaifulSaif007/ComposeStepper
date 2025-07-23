@@ -38,8 +38,8 @@ fun VerticalStepper(
                         else -> StepState.ACTIVE
                     },
                     stepValue = index + 1,
-                    stepTitle = item.stepTitle,
-                    stepContent = item.stepContent,
+                    rightSideContent = item.rightSideContent,
+                    leftSideContent = item.leftSideContent,
                 )
             }
 
@@ -55,24 +55,25 @@ private fun StepperItem(
     hasPreviousStep: Boolean,
     state: StepState,
     stepValue: Int,
-    stepTitle: String,
-    stepContent: @Composable () -> Unit
+    rightSideContent: @Composable () -> Unit,
+    leftSideContent: @Composable () -> Unit,
 ) {
 
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        val (prefixItem, circle, title, content, downLine, upLine) = createRefs()
+        val (prefixItem, circle, content, downLine, upLine) = createRefs()
 
-        Text(
+        Column(
             modifier = Modifier.constrainAs(prefixItem) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
                 bottom.linkTo(parent.bottom)
             },
-            text = "Prefix"
-        )
+        ) {
+            leftSideContent()
+        }
 
         if (hasPreviousStep) VerticalDivider(
             modifier = Modifier
@@ -131,29 +132,18 @@ private fun StepperItem(
             }
         }
 
-        Text(
-            modifier = Modifier.constrainAs(title) {
-                top.linkTo(parent.top)
-                start.linkTo(circle.end, margin = 8.dp)
-                bottom.linkTo(circle.bottom)
-                width = Dimension.fillToConstraints
-            },
-            text = stepTitle,
-        )
 
         Column(
             modifier = Modifier
                 .constrainAs(content) {
-                    top.linkTo(title.bottom)
-                    start.linkTo(title.start)
+                    top.linkTo(parent.top)
+                    start.linkTo(circle.end, margin = 8.dp)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
                 }
                 .padding(bottom = 8.dp),
         ) {
-            Spacer(modifier = Modifier.padding(bottom = 4.dp))
-            stepContent()
-            Spacer(modifier = Modifier.padding(bottom = 4.dp))
+            rightSideContent()
         }
 
 
@@ -187,11 +177,11 @@ private fun StepperItemPreview() {
         hasNextStep = true,
         hasPreviousStep = true,
         state = StepState.ACTIVE,
-        stepTitle = "step 1",
         stepValue = 1,
-        stepContent = {
+        rightSideContent = {
             Text("Watch me here")
-        }
+        },
+        leftSideContent = {}
     )
 }
 
@@ -202,23 +192,57 @@ private fun StepperPreview() {
         numberOfSteps = 4,
         activeStep = 3,
         stepItems = listOf(
-            StepItem("Step 1") {
-                Text("Watch me here")
-            },
-            StepItem("Step 2") {
-                Text("Watch me here")
-            },
-            StepItem("Step 3") {
-                Text("Watch me here")
-            },
-            StepItem("Step 4") {
-                Text("Watch me here")
-            }
+            StepItem(
+                rightSideContent = {
+                    Column(
+                        modifier = Modifier.padding(2.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Step 1")
+                        Text("Step 1 has some subtitle")
+                    }
+                }
+            ),
+            StepItem(
+                rightSideContent = {
+                    Column(
+                        modifier = Modifier.padding(2.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Step 2")
+                        Text("Step 2 has some subtitle")
+                    }
+                }
+            ),
+            StepItem(
+                rightSideContent = {
+                    Column(
+                        modifier = Modifier.padding(2.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Step 3")
+                        Text("Step 3 has some subtitle")
+                    }
+                }
+            ),
+            StepItem(
+                rightSideContent = {
+                    Column(
+                        modifier = Modifier.padding(2.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Step 4")
+                        Text("Step 4 has some subtitle")
+                    }
+                }
+            ),
         )
     )
 }
 
 data class StepItem(
-    val stepTitle: String,
-    val stepContent: @Composable () -> Unit
+    val rightSideContent: @Composable () -> Unit,
+    val leftSideContent: @Composable () -> Unit = {
+        Text("Prefix")
+    },
 )
