@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,13 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.saiful.composestepper.ui.theme.ComposeStepperTheme
 import com.saiful.stepper.HorizontalStepper
@@ -74,26 +72,56 @@ class MainActivity : ComponentActivity() {
                         Spacer(modifier = Modifier.size(10.dp))
                         
                         Column(modifier = Modifier.padding(4.dp)) {
-
                             VerticalStepper(
                                 numberOfSteps = 4,
                                 activeStep = activeStepV.intValue,
                                 stepItems = listOf(
-                                    StepItem("Step 1") {
-                                        Text("Watch me here")
-                                    },
-                                    StepItem("Step 2") {
-                                        Text("Watch me here")
-                                    },
-                                    StepItem("Step 3") {
-                                        Text("Watch me here")
-                                    },
-                                    StepItem("Step 4") {
-                                        Text("Watch me here")
-                                    }
+                                    StepItem(
+                                        rightSideContent = {
+                                            Column(
+                                                modifier = Modifier.padding(2.dp),
+                                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                Text("Step 1")
+                                                Text("Step 1 has some subtitle")
+                                            }
+                                        }
+                                    ),
+                                    StepItem(
+                                        rightSideContent = {
+                                            Column(
+                                                modifier = Modifier.padding(2.dp),
+                                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                Text("Step 2")
+                                                Text("Step 2 has some subtitle")
+                                            }
+                                        }
+                                    ),
+                                    StepItem(
+                                        rightSideContent = {
+                                            Column(
+                                                modifier = Modifier.padding(2.dp),
+                                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                Text("Step 3")
+                                                Text("Step 3 has some subtitle")
+                                            }
+                                        }
+                                    ),
+                                    StepItem(
+                                        rightSideContent = {
+                                            Column(
+                                                modifier = Modifier.padding(2.dp),
+                                                verticalArrangement = Arrangement.spacedBy(4.dp)
+                                            ) {
+                                                Text("Step 4")
+                                                Text("Step 4 has some subtitle")
+                                            }
+                                        }
+                                    ),
                                 )
                             )
-
                             Button(
                                 onClick = {
                                     if (activeStepV.intValue < 4) {
@@ -113,21 +141,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ComposeStepperTheme {
-        Greeting("Android")
     }
 }
